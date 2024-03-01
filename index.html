@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bomberman JS Game</title>
+  </head>
+
+  <style>
+    canvas {
+      background-color: green;
+      border: 10px solid gray;
+    }
+  </style>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+  </body>
+
+  <script>
+    // Definir el mapLevel1
+    // 1 = Muro
+    // 2 = Bloque rompible
+    // 3 = Jugador
+    let map = [
+      [
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1,
+      ],
+
+      [
+        1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 0, 2, 0, 0, 0,
+        0,
+      ],
+
+      [
+        1, 0, 1, 0, 1, 0, 1, 2, 1, 2, 1, 0, 1, 0, 1, 2, 1, 0, 1, 2, 1, 2, 1, 2,
+        1,
+      ],
+      [
+        1, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 2, 0, 2,
+        2,
+      ],
+      [
+        1, 0, 1, 0, 1, 2, 1, 0, 1, 2, 1, 0, 1, 0, 1, 0, 1, 2, 1, 0, 1, 0, 1, 2,
+        1,
+      ],
+      [
+        1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 2, 0, 2, 0, 2, 0, 0, 0, 0, 0, 2, 0,
+        0,
+      ],
+      [
+        1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 1, 0, 1, 2, 1, 2, 1, 0, 1, 0, 1, 2, 1, 0,
+        1,
+      ],
+      [
+        1, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 0,
+        2,
+      ],
+      [
+        1, 0, 1, 2, 1, 2, 1, 0, 1, 2, 1, 2, 1, 0, 1, 2, 1, 0, 1, 0, 1, 0, 1, 2,
+        1,
+      ],
+      [
+        1, 0, 2, 0, 2, 0, 2, 0, 0, 0, 2, 0, 2, 0, 2, 0, 0, 0, 0, 2, 2, 0, 0, 2,
+        2,
+      ],
+      [
+        1, 2, 1, 0, 1, 0, 1, 2, 1, 2, 1, 0, 1, 2, 1, 0, 1, 2, 1, 2, 1, 0, 1, 2,
+        1,
+      ],
+      [
+        1, 2, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2,
+        2,
+      ],
+      [
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1,
+      ],
+    ];
+
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Ancho y alto del canvas
+    canvas.width = 1050;
+    canvas.height = 545;
+
+    // Crear una nueva imagen para el sprite sheet
+    var spriteSheet = new Image();
+    spriteSheet.src = "./sprites.png";
+
+    /* VARIABLES DEL JUGADOR */
+    const PLAYER_SENSITIVITY = 8;
+
+    const playerHeight = 15;
+    const playerWidth = 15;
+
+    //posición del jugador
+    let playerX = 42;
+    let playerY = 42;
+
+    // VARIABLES MOVIMIENTO DEL JUGADOR
+    let rightPressed = false;
+    let leftPressed = false;
+    let upPressed = false;
+    let downPressed = false;
+
+    // Tamaño de cada celda en el mapa
+    var cellSize = 42; // Tamaño de cada sprite en el sprite sheet
+    let bricks = [];
+    //DIBUJAR EL MAPA
+    function drawMap() {
+      // Iterar sobre cada celda del mapa
+      for (var i = 0; i < map.length; i++) {
+        for (var j = 0; j < map[i].length; j++) {
+          // Si el valor de la celda es 1 (pared), dibujar el sprite de la pared
+          if (map[i][j] === 1) {
+            // Calcular las coordenadas de dibujo en el canvas
+            var x = j * cellSize;
+            var y = i * cellSize;
+
+            // Dibujar el sprite de la pared en el canvas
+            ctx.drawImage(
+              spriteSheet,
+              48,
+              48,
+              15,
+              15,
+              x,
+              y,
+              cellSize,
+              cellSize
+            );
+          } else if (map[i][j] === 2) {
+            // Calcular las coordenadas de dibujo en el canvas
+            var x = j * cellSize;
+            var y = i * cellSize;
+
+            // Dibujar el otro sprite en el canvas (cuando el valor de la celda es 2)
+            ctx.drawImage(
+              spriteSheet,
+              64,
+              48,
+              15,
+              15,
+              x,
+              y,
+              cellSize,
+              cellSize
+            );
+          }
+        }
+      }
+    }
+
+    // DIBUJAR EL JUGADOR
+    function drawPlayer() {
+      //Dibujar el jugador
+      ctx.drawImage(
+        spriteSheet,
+        0,
+        0,
+        playerWidth, // el tamaño del recorte
+        playerHeight, // tamaño del recorte
+        playerX, // posición X del dibujo
+        playerY, // posición Y del dibujo
+        cellSize, // ancho del dibujo
+        cellSize // alto del dibujo);
+      );
+    }
+
+    function collisionCheck() {
+      for (var i = 0; i < map.length; i++) {
+        for (var j = 0; j < map[i].length; j++) {
+          // Si el valor de la celda es 1 (pared), dibujar el sprite de la pared
+          if (map[i][j] === 1) {
+            // Calcular las coordenadas de dibujo en el canvas
+            var x = j * cellSize;
+            var y = i * cellSize;
+
+            console.log("el 1");
+          } else if (map[i][j] === 2) {
+            console.log("el 2");
+          }
+        }
+      }
+    }
+
+    function playerMovement() {
+      if (rightPressed && playerX < canvas.width - playerWidth) {
+        playerX += PLAYER_SENSITIVITY;
+      } else if (leftPressed && playerX > 0) {
+        playerX -= PLAYER_SENSITIVITY;
+      } else if (upPressed && playerY > 0) {
+        playerY -= PLAYER_SENSITIVITY;
+      } else if (downPressed && playerY < canvas.height - playerHeight) {
+        playerY += PLAYER_SENSITIVITY;
+      }
+    }
+
+    // LIMPIAR EL CANVAS
+    function cleanCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // INICIAR EVENTOS
+    function initEvents() {
+      document.addEventListener("keydown", keyDownHandler);
+      document.addEventListener("keyup", keyUpHandler);
+
+      function keyDownHandler(event) {
+        const { key } = event;
+        if (
+          key === "Right" ||
+          key === "ArrowRight" ||
+          key.toLowerCase() === "d"
+        ) {
+          rightPressed = true;
+        } else if (
+          key === "Left" ||
+          key === "ArrowLeft" ||
+          key.toLowerCase() === "a"
+        ) {
+          leftPressed = true;
+        } else if (
+          key === "Up" ||
+          key === "ArrowUp" ||
+          key.toLowerCase() === "w"
+        ) {
+          upPressed = true;
+        } else if (
+          key === "Down" ||
+          key === "ArrowDown" ||
+          key.toLowerCase() === "s"
+        ) {
+          downPressed = true;
+        }
+      }
+
+      function keyUpHandler(event) {
+        const { key } = event;
+        if (
+          key === "Right" ||
+          key === "ArrowRight" ||
+          key.toLowerCase() === "d"
+        ) {
+          rightPressed = false;
+        } else if (
+          key === "Left" ||
+          key === "ArrowLeft" ||
+          key.toLowerCase() === "a"
+        ) {
+          leftPressed = false;
+        } else if (
+          key === "Up" ||
+          key === "ArrowUp" ||
+          key.toLowerCase() === "w"
+        ) {
+          upPressed = false;
+        } else if (
+          key === "Down" ||
+          key === "ArrowDown" ||
+          key.toLowerCase() === "s"
+        ) {
+          downPressed = false;
+        }
+      }
+    }
+
+    // a que velocidad de fps queremos que renderice nuestro juego
+    const fps = 60;
+
+    let msPrev = window.performance.now();
+    let msFPSPrev = window.performance.now() + 1000;
+    const msPerFrame = 1000 / fps;
+    let frames = 0;
+    let framesPerSec = fps;
+
+    function draw() {
+      window.requestAnimationFrame(draw);
+
+      const msNow = window.performance.now();
+      const msPassed = msNow - msPrev;
+
+      if (msPassed < msPerFrame) return;
+
+      const excessTime = msPassed % msPerFrame;
+      msPrev = msNow - excessTime;
+
+      frames++;
+
+      if (msFPSPrev < msNow) {
+        msFPSPrev = window.performance.now() + 1000;
+        framesPerSec = frames;
+        frames = 0;
+      }
+      // Borrar el canvas
+      cleanCanvas();
+
+      // Dibujar el mapa y los elementos del juego
+      drawMap();
+
+      //Dibujar el jugador
+      drawPlayer();
+
+      playerMovement();
+    }
+
+    // Iniciar el bucle de juego
+    draw();
+    initEvents();
+  </script>
+</html>
