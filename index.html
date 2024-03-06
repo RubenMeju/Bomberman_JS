@@ -13,8 +13,10 @@
     }
   </style>
   <body>
-    <canvas id="gameCanvas"></canvas>
+    <canvas id="canvas"></canvas>
   </body>
+  <script src="game.js"></script>
+  <!--
 
   <script>
     // Definir el mapLevel1
@@ -102,6 +104,7 @@
     let leftPressed = false;
     let upPressed = false;
     let downPressed = false;
+    let direction = "right";
 
     // VARIABLES de la bomba
     let bombX = -100; // Inicialmente fuera del canvas
@@ -399,7 +402,12 @@
 
     // Función para colocar la bomba
     function placeBomb() {
-      bombX = playerX; // Colocar la bomba en la posición actual del jugador en X
+      if (rightPressed) {
+        bombX = playerX + playerWidth; // Colocar la bomba en la posición actual del jugador en X
+      } else if (leftPressed) {
+        bombX = playerX - playerWidth; // Colocar la bomba en la posición actual del jugador en X
+      }
+
       bombY = playerY; // Colocar la bomba en la posición actual del jugador en Y
 
       // Después de 5 segundos, eliminar la bomba
@@ -455,4 +463,4 @@
     draw();
     initEvents();
   </script>
-</html>
+--></html>
