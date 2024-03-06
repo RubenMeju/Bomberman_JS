@@ -115,6 +115,8 @@
     let playerAnimationCounter = 0; // Contador para controlar la velocidad de la animación
     let isAnimatingLeft = false; // Estado de la animación hacia la izquierda
     let isAnimatingRight = false;
+    let isAnimatingUp = false;
+    let isAnimatingDown = false;
 
     //DIBUJAR EL MAPA
     function drawMap() {
@@ -175,6 +177,18 @@
         [16, 16], // Sprite para la derecha - Frame 2
         [32, 16], // Sprite para la derecha - Frame 3
       ];
+      // Coordenadas de recorte para la animación hacia arriba
+      const upAnimationCoordinates = [
+        [48, 16], // Sprite para la izquierda - Frame 1
+        [64, 16], // Sprite para la izquierda - Frame 2
+        [80, 16], // Sprite para la izquierda - Frame 3
+      ];
+      // Coordenadas de recorte para la animación hacia arriba
+      const downAnimationCoordinates = [
+        [48, 0], // Sprite para la izquierda - Frame 1
+        [64, 0], // Sprite para la izquierda - Frame 2
+        [80, 0], // Sprite para la izquierda - Frame 3
+      ];
 
       // Si la animación está activa, seleccionar las coordenadas de recorte adecuadas para la animación
       let animationCoordinates = leftAnimationCoordinates;
@@ -184,6 +198,10 @@
       } else if (isAnimatingRight) {
         // Si la animación hacia la derecha está activa, seleccionar las coordenadas de recorte adecuadas para la animación
         animationCoordinates = rightAnimationCoordinates;
+      } else if (isAnimatingUp) {
+        animationCoordinates = upAnimationCoordinates;
+      } else if (isAnimatingDown) {
+        animationCoordinates = downAnimationCoordinates;
       }
 
       // Dibujar el sprite del jugador con las coordenadas de recorte adecuadas
@@ -200,7 +218,12 @@
       );
 
       // Controlar la velocidad de la animación si está activa
-      if (isAnimatingLeft || isAnimatingRight) {
+      if (
+        isAnimatingLeft ||
+        isAnimatingRight ||
+        isAnimatingUp ||
+        isAnimatingDown
+      ) {
         playerAnimationCounter++;
         if (playerAnimationCounter >= 10) {
           // Ajusta este valor para cambiar la velocidad de la animación
@@ -328,14 +351,14 @@
         key.toLowerCase() === "w"
       ) {
         upPressed = true;
-        isAnimating = true;
+        isAnimatingUp = true;
       } else if (
         key === "Down" ||
         key === "ArrowDown" ||
         key.toLowerCase() === "s"
       ) {
         downPressed = true;
-        isAnimating = true;
+        isAnimatingDown = true;
       } else if (key === " " || key.toLowerCase() === "space") {
         placeBomb(); // Llamar a la función cuando se presiona la tecla espacio
       }
@@ -363,14 +386,14 @@
         key.toLowerCase() === "w"
       ) {
         upPressed = false;
-        isAnimating = false;
+        isAnimatingUp = false;
       } else if (
         key === "Down" ||
         key === "ArrowDown" ||
         key.toLowerCase() === "s"
       ) {
         downPressed = false;
-        isAnimating = false;
+        isAnimatingDown = false;
       }
     }
 
