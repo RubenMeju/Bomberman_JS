@@ -8,7 +8,7 @@
 
   <style>
     canvas {
-      background-color: green;
+      background-color: #388700;
       border: 10px solid gray;
     }
   </style>
@@ -26,12 +26,10 @@
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1,
       ],
-
       [
         1, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 0, 2, 0, 0, 0,
         0,
       ],
-
       [
         1, 0, 1, 0, 1, 0, 1, 2, 1, 2, 1, 0, 1, 0, 1, 2, 1, 0, 1, 2, 1, 2, 1, 2,
         1,
@@ -105,8 +103,19 @@
     let upPressed = false;
     let downPressed = false;
 
+    // VARIABLES de la bomba
+    let bombX = -100; // Inicialmente fuera del canvas
+    let bombY = -100; // Inicialmente fuera del canvas
+
     // Tamaño de cada celda en el mapa
     var cellSize = 42; // Tamaño de cada sprite en el sprite sheet
+
+    // Variables para la animación del jugador
+    let playerAnimationFrame = 0; // Índice de la animación del jugador
+    let playerAnimationCounter = 0; // Contador para controlar la velocidad de la animación
+    let isAnimatingLeft = false; // Estado de la animación hacia la izquierda
+    let isAnimatingRight = false;
+
     //DIBUJAR EL MAPA
     function drawMap() {
       // Iterar sobre cada celda del mapa
@@ -154,17 +163,65 @@
 
     // DIBUJAR EL JUGADOR
     function drawPlayer() {
-      //Dibujar el jugador
+      // Coordenadas de recorte para la animación de la izquierda (simplemente invierte las coordenadas X)
+      const leftAnimationCoordinates = [
+        [0, 0], // Sprite para la izquierda - Frame 1
+        [16, 0], // Sprite para la izquierda - Frame 2
+        [32, 0], // Sprite para la izquierda - Frame 3
+      ];
+      // Coordenadas de recorte para la animación hacia la derecha
+      const rightAnimationCoordinates = [
+        [0, 16], // Sprite para la derecha - Frame 1
+        [16, 16], // Sprite para la derecha - Frame 2
+        [32, 16], // Sprite para la derecha - Frame 3
+      ];
+
+      // Si la animación está activa, seleccionar las coordenadas de recorte adecuadas para la animación
+      let animationCoordinates = leftAnimationCoordinates;
+
+      if (isAnimatingLeft) {
+        animationCoordinates = leftAnimationCoordinates;
+      } else if (isAnimatingRight) {
+        // Si la animación hacia la derecha está activa, seleccionar las coordenadas de recorte adecuadas para la animación
+        animationCoordinates = rightAnimationCoordinates;
+      }
+
+      // Dibujar el sprite del jugador con las coordenadas de recorte adecuadas
       ctx.drawImage(
         spriteSheet,
-        0,
-        0,
-        13, // el tamaño del recorte
+        animationCoordinates[playerAnimationFrame][0],
+        animationCoordinates[playerAnimationFrame][1],
+        16, // Ancho del sprite recortado
+        16, // Alto del sprite recortado
+        playerX,
+        playerY,
+        32, // Ancho del sprite dibujado
+        32 // Alto del sprite dibujado
+      );
+
+      // Controlar la velocidad de la animación si está activa
+      if (isAnimatingLeft || isAnimatingRight) {
+        playerAnimationCounter++;
+        if (playerAnimationCounter >= 10) {
+          // Ajusta este valor para cambiar la velocidad de la animación
+          playerAnimationCounter = 0;
+          playerAnimationFrame = (playerAnimationFrame + 1) % 3; // Modifica este valor si cambias la cantidad de frames en la animación
+        }
+      }
+    }
+    // Dibujar la bomba
+    function drawBomb() {
+      // Dibujar la bomba
+      ctx.drawImage(
+        spriteSheet,
+        32,
+        48,
+        15, // el tamaño del recorte
         15, // tamaño del recorte
-        playerX, // posición X del dibujo
-        playerY, // posición Y del dibujo
-        32, // ancho del dibujo
-        32 // alto del dibujo);
+        bombX, // posición X del dibujo
+        bombY, // posición Y del dibujo
+        40, // ancho del dibujo
+        40 // alto del dibujo
       );
     }
 
@@ -247,64 +304,86 @@
     function initEvents() {
       document.addEventListener("keydown", keyDownHandler);
       document.addEventListener("keyup", keyUpHandler);
+    }
 
-      function keyDownHandler(event) {
-        const { key } = event;
-        if (
-          key === "Right" ||
-          key === "ArrowRight" ||
-          key.toLowerCase() === "d"
-        ) {
-          rightPressed = true;
-        } else if (
-          key === "Left" ||
-          key === "ArrowLeft" ||
-          key.toLowerCase() === "a"
-        ) {
-          leftPressed = true;
-        } else if (
-          key === "Up" ||
-          key === "ArrowUp" ||
-          key.toLowerCase() === "w"
-        ) {
-          upPressed = true;
-        } else if (
-          key === "Down" ||
-          key === "ArrowDown" ||
-          key.toLowerCase() === "s"
-        ) {
-          downPressed = true;
-        }
+    function keyDownHandler(event) {
+      const { key } = event;
+      if (
+        key === "Right" ||
+        key === "ArrowRight" ||
+        key.toLowerCase() === "d"
+      ) {
+        rightPressed = true;
+        isAnimatingRight = true;
+      } else if (
+        key === "Left" ||
+        key === "ArrowLeft" ||
+        key.toLowerCase() === "a"
+      ) {
+        leftPressed = true;
+        isAnimatingLeft = true;
+      } else if (
+        key === "Up" ||
+        key === "ArrowUp" ||
+        key.toLowerCase() === "w"
+      ) {
+        upPressed = true;
+        isAnimating = true;
+      } else if (
+        key === "Down" ||
+        key === "ArrowDown" ||
+        key.toLowerCase() === "s"
+      ) {
+        downPressed = true;
+        isAnimating = true;
+      } else if (key === " " || key.toLowerCase() === "space") {
+        placeBomb(); // Llamar a la función cuando se presiona la tecla espacio
       }
+    }
 
-      function keyUpHandler(event) {
-        const { key } = event;
-        if (
-          key === "Right" ||
-          key === "ArrowRight" ||
-          key.toLowerCase() === "d"
-        ) {
-          rightPressed = false;
-        } else if (
-          key === "Left" ||
-          key === "ArrowLeft" ||
-          key.toLowerCase() === "a"
-        ) {
-          leftPressed = false;
-        } else if (
-          key === "Up" ||
-          key === "ArrowUp" ||
-          key.toLowerCase() === "w"
-        ) {
-          upPressed = false;
-        } else if (
-          key === "Down" ||
-          key === "ArrowDown" ||
-          key.toLowerCase() === "s"
-        ) {
-          downPressed = false;
-        }
+    function keyUpHandler(event) {
+      const { key } = event;
+      if (
+        key === "Right" ||
+        key === "ArrowRight" ||
+        key.toLowerCase() === "d"
+      ) {
+        rightPressed = false;
+        isAnimatingRight = false;
+      } else if (
+        key === "Left" ||
+        key === "ArrowLeft" ||
+        key.toLowerCase() === "a"
+      ) {
+        leftPressed = false;
+        isAnimatingLeft = false;
+      } else if (
+        key === "Up" ||
+        key === "ArrowUp" ||
+        key.toLowerCase() === "w"
+      ) {
+        upPressed = false;
+        isAnimating = false;
+      } else if (
+        key === "Down" ||
+        key === "ArrowDown" ||
+        key.toLowerCase() === "s"
+      ) {
+        downPressed = false;
+        isAnimating = false;
       }
+    }
+
+    // Función para colocar la bomba
+    function placeBomb() {
+      bombX = playerX; // Colocar la bomba en la posición actual del jugador en X
+      bombY = playerY; // Colocar la bomba en la posición actual del jugador en Y
+
+      // Después de 5 segundos, eliminar la bomba
+      setTimeout(() => {
+        bombX = -100; // Mover la bomba fuera del canvas
+        bombY = -100; // Mover la bomba fuera del canvas
+      }, 5000);
     }
 
     // a que velocidad de fps queremos que renderice nuestro juego
@@ -342,6 +421,9 @@
 
       //Dibujar el jugador
       drawPlayer();
+
+      //Dibujar la bomba
+      drawBomb();
 
       playerMovement();
     }
