@@ -93,10 +93,6 @@ class Player {
 
     this.playerAnimationFrame = 0; // Índice de la animación del jugador
     this.playerAnimationCounter = 0; // Contador para controlar la velocidad de la animación
-    this.isAnimatingLeft = false; // Estado de la animación hacia la izquierda
-    this.isAnimatingRight = false;
-    this.isAnimatingUp = false;
-    this.isAnimatingDown = false;
   }
   draw() {
     // Coordenadas de recorte para la animación de la izquierda (simplemente invierte las coordenadas X)
@@ -127,14 +123,14 @@ class Player {
     // Si la animación está activa, seleccionar las coordenadas de recorte adecuadas para la animación
     let animationCoordinates = leftAnimationCoordinates;
 
-    if (this.isAnimatingLeft) {
+    if (this.leftPressed) {
       animationCoordinates = leftAnimationCoordinates;
-    } else if (this.isAnimatingRight) {
+    } else if (this.rightPressed) {
       // Si la animación hacia la derecha está activa, seleccionar las coordenadas de recorte adecuadas para la animación
       animationCoordinates = rightAnimationCoordinates;
-    } else if (this.isAnimatingUp) {
+    } else if (this.upPressed) {
       animationCoordinates = upAnimationCoordinates;
-    } else if (this.isAnimatingDown) {
+    } else if (this.downPressed) {
       animationCoordinates = downAnimationCoordinates;
     }
 
@@ -153,10 +149,10 @@ class Player {
 
     // Controlar la velocidad de la animación si está activa
     if (
-      this.isAnimatingLeft ||
-      this.isAnimatingRight ||
-      this.isAnimatingUp ||
-      this.isAnimatingDown
+      this.leftPressed ||
+      this.rightPressed ||
+      this.upPressed ||
+      this.downPressed
     ) {
       this.playerAnimationCounter++;
       if (this.playerAnimationCounter >= 10) {
@@ -254,24 +250,24 @@ function keyDownHandler(event) {
   const { key } = event;
   if (key === "Right" || key === "ArrowRight" || key.toLowerCase() === "d") {
     player.rightPressed = true;
-    player.isAnimatingRight = true;
+    player.rightPressed = true;
   } else if (
     key === "Left" ||
     key === "ArrowLeft" ||
     key.toLowerCase() === "a"
   ) {
     player.leftPressed = true;
-    player.isAnimatingLeft = true;
+    // player.isAnimatingLeft = true;
   } else if (key === "Up" || key === "ArrowUp" || key.toLowerCase() === "w") {
     player.upPressed = true;
-    player.isAnimatingUp = true;
+    player.upPressed = true;
   } else if (
     key === "Down" ||
     key === "ArrowDown" ||
     key.toLowerCase() === "s"
   ) {
     player.downPressed = true;
-    player.isAnimatingDown = true;
+    player.downPressed = true;
   } else if (key === " " || key.toLowerCase() === "space") {
     placeBomb(); // Llamar a la función cuando se presiona la tecla espacio
   }
@@ -281,24 +277,24 @@ function keyUpHandler(event) {
   const { key } = event;
   if (key === "Right" || key === "ArrowRight" || key.toLowerCase() === "d") {
     player.rightPressed = false;
-    player.isAnimatingRight = false;
+    player.rightPressed = false;
   } else if (
     key === "Left" ||
     key === "ArrowLeft" ||
     key.toLowerCase() === "a"
   ) {
     player.leftPressed = false;
-    player.isAnimatingLeft = false;
+    //player.isAnimatingLeft = false;
   } else if (key === "Up" || key === "ArrowUp" || key.toLowerCase() === "w") {
     player.upPressed = false;
-    player.isAnimatingUp = false;
+    player.upPressed = false;
   } else if (
     key === "Down" ||
     key === "ArrowDown" ||
     key.toLowerCase() === "s"
   ) {
     player.downPressed = false;
-    player.isAnimatingDown = false;
+    player.downPressed = false;
   }
 }
 
