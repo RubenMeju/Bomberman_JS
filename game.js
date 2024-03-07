@@ -121,16 +121,15 @@ class Player {
     ];
 
     // Si la animación está activa, seleccionar las coordenadas de recorte adecuadas para la animación
-    let animationCoordinates = leftAnimationCoordinates;
+    let animationCoordinates = rightAnimationCoordinates;
 
-    if (this.leftPressed) {
+    if (this.direction === "left") {
       animationCoordinates = leftAnimationCoordinates;
-    } else if (this.rightPressed) {
-      // Si la animación hacia la derecha está activa, seleccionar las coordenadas de recorte adecuadas para la animación
+    } else if (this.direction === "right") {
       animationCoordinates = rightAnimationCoordinates;
-    } else if (this.upPressed) {
+    } else if (this.direction === "up") {
       animationCoordinates = upAnimationCoordinates;
-    } else if (this.downPressed) {
+    } else if (this.direction === "down") {
       animationCoordinates = downAnimationCoordinates;
     }
 
@@ -250,24 +249,24 @@ function keyDownHandler(event) {
   const { key } = event;
   if (key === "Right" || key === "ArrowRight" || key.toLowerCase() === "d") {
     player.rightPressed = true;
-    player.rightPressed = true;
+    player.direction = "right";
   } else if (
     key === "Left" ||
     key === "ArrowLeft" ||
     key.toLowerCase() === "a"
   ) {
     player.leftPressed = true;
-    // player.isAnimatingLeft = true;
+    player.direction = "left";
   } else if (key === "Up" || key === "ArrowUp" || key.toLowerCase() === "w") {
     player.upPressed = true;
-    player.upPressed = true;
+    player.direction = "up";
   } else if (
     key === "Down" ||
     key === "ArrowDown" ||
     key.toLowerCase() === "s"
   ) {
     player.downPressed = true;
-    player.downPressed = true;
+    player.direction = "down";
   } else if (key === " " || key.toLowerCase() === "space") {
     placeBomb(); // Llamar a la función cuando se presiona la tecla espacio
   }
@@ -276,7 +275,6 @@ function keyDownHandler(event) {
 function keyUpHandler(event) {
   const { key } = event;
   if (key === "Right" || key === "ArrowRight" || key.toLowerCase() === "d") {
-    player.rightPressed = false;
     player.rightPressed = false;
   } else if (
     key === "Left" ||
@@ -287,13 +285,11 @@ function keyUpHandler(event) {
     //player.isAnimatingLeft = false;
   } else if (key === "Up" || key === "ArrowUp" || key.toLowerCase() === "w") {
     player.upPressed = false;
-    player.upPressed = false;
   } else if (
     key === "Down" ||
     key === "ArrowDown" ||
     key.toLowerCase() === "s"
   ) {
-    player.downPressed = false;
     player.downPressed = false;
   }
 }
