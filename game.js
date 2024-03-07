@@ -82,7 +82,7 @@ class Player {
     this.y = yPlayer;
     this.width = 32;
     this.height = 32;
-    this.speed = 3;
+    this.speed = 1;
 
     // VARIABLES MOVIMIENTO DEL JUGADOR
     this.rightPressed = false;
@@ -93,6 +93,11 @@ class Player {
 
     this.playerAnimationFrame = 0; // Índice de la animación del jugador
     this.playerAnimationCounter = 0; // Contador para controlar la velocidad de la animación
+
+    // VARIABLES BOMBAS
+    //this.bombX = -100; // Inicialmente fuera del canvas
+    //this.bombY = -100; // Inicialmente fuera del canvas
+    this.bombs = [];
   }
   draw() {
     // Coordenadas de recorte para la animación de la izquierda (simplemente invierte las coordenadas X)
@@ -231,6 +236,53 @@ class Player {
     const j = Math.floor(x / cellSize);
     return level[i][j] === 1 || level[i][j] === 2;
   }
+
+  drawBomb() {
+    // Dibujar la bomba
+    for (let i = 0; i < this.bombs.length; i++) {
+      console.log(this.bombs[i]);
+      ctx.drawImage(
+        spriteSheet,
+        32,
+        48,
+        15, // el tamaño del recorte
+        15, // tamaño del recorte
+        this.bombs[i][0], // posición X del dibujo
+        this.bombs[i][1], // posición Y del dibujo
+        40, // ancho del dibujo
+        40 // alto del dibujo
+      );
+    }
+  }
+  placeBomb() {
+    console.log("pulsado space");
+
+    if (this.direction === "right") {
+      this.bombs.push([this.x + cellSize, this.y]); // Colocar la bomba en la posición actual del jugador en X
+    } else if (this.direction === "left") {
+      this.bombs.push([this.x - cellSize, this.y]); // Colocar la bomba en la posición actual del jugador en X
+    } else if (this.direction === "up") {
+      this.bombs.push([this.x, this.y - cellSize]); // Colocar la bomba en la posición actual del jugador en Y
+    } else if (this.direction === "down") {
+      this.bombs.push([this.x, this.y + cellSize]);
+    }
+
+    // Después de 5 segundos, eliminar la bomba
+    // Suponiendo que `this.bombs` es un array que contiene las coordenadas de las bombas
+
+    for (let i = 0; i < this.bombs.length; i++) {
+      // Usamos una función dentro de un bucle para capturar el valor actual de `i`
+      let bombsArray = this.bombs;
+      setTimeout(
+        function (index) {
+          // Para cada bomba, creamos un temporizador que las elimine después de 3 segundos
+          bombsArray.splice(index, 1); // Eliminar la bomba en la posición `index`
+          console.log("Bomba eliminada:", index);
+        }.bind(this, i),
+        3000
+      ); // Usamos bind para pasar el valor actual de `i` y mantener el contexto de `this`
+    }
+  }
 }
 
 const player = new Player(42, 42);
@@ -268,7 +320,7 @@ function keyDownHandler(event) {
     player.downPressed = true;
     player.direction = "down";
   } else if (key === " " || key.toLowerCase() === "space") {
-    placeBomb(); // Llamar a la función cuando se presiona la tecla espacio
+    player.placeBomb(); // Llamar a la función cuando se presiona la tecla espacio
   }
 }
 
@@ -303,6 +355,7 @@ function game() {
 
   player.draw();
   player.movement();
+  player.drawBomb();
 }
 
 game();
