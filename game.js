@@ -75,13 +75,6 @@ function drawMap() {
   }
 }
 
-// VARIABLES MOVIMIENTO DEL JUGADOR
-let rightPressed = false;
-let leftPressed = false;
-let upPressed = false;
-let downPressed = false;
-let direction = "right";
-
 // El jugador
 class Player {
   constructor(xPlayer, yPlayer) {
@@ -90,6 +83,14 @@ class Player {
     this.width = 32;
     this.height = 32;
     this.speed = 3;
+
+    // VARIABLES MOVIMIENTO DEL JUGADOR
+    this.rightPressed = false;
+    this.leftPressed = false;
+    this.upPressed = false;
+    this.downPressed = false;
+    this.direction = "right";
+
     this.playerAnimationFrame = 0; // Índice de la animación del jugador
     this.playerAnimationCounter = 0; // Contador para controlar la velocidad de la animación
     this.isAnimatingLeft = false; // Estado de la animación hacia la izquierda
@@ -175,7 +176,7 @@ class Player {
     const nextGridYUp = Math.floor((this.y - 1) / cellSize);
     const nextGridYDown = Math.floor((this.y + this.height + 2) / cellSize);
 
-    if (rightPressed && this.x < canvas.width - this.width - cellSize) {
+    if (this.rightPressed && this.x < canvas.width - this.width - cellSize) {
       if (
         this.canMoveTo(nextGridXRight, Math.floor(this.y / cellSize)) &&
         this.canMoveTo(
@@ -185,7 +186,7 @@ class Player {
       ) {
         nextPlayerX += this.speed;
       }
-    } else if (leftPressed && this.x > cellSize) {
+    } else if (this.leftPressed && this.x > cellSize) {
       if (
         this.canMoveTo(nextGridXLeft, Math.floor(this.y / cellSize)) &&
         this.canMoveTo(
@@ -195,7 +196,7 @@ class Player {
       ) {
         nextPlayerX -= this.speed;
       }
-    } else if (upPressed && this.y > cellSize) {
+    } else if (this.upPressed && this.y > cellSize) {
       if (
         this.canMoveTo(Math.floor(this.x / cellSize), nextGridYUp) &&
         this.canMoveTo(
@@ -205,7 +206,10 @@ class Player {
       ) {
         nextPlayerY -= this.speed;
       }
-    } else if (downPressed && this.y < canvas.height - this.height - cellSize) {
+    } else if (
+      this.downPressed &&
+      this.y < canvas.height - this.height - cellSize
+    ) {
       if (
         this.canMoveTo(Math.floor(this.x / cellSize), nextGridYDown) &&
         this.canMoveTo(
@@ -249,24 +253,24 @@ function initEvents() {
 function keyDownHandler(event) {
   const { key } = event;
   if (key === "Right" || key === "ArrowRight" || key.toLowerCase() === "d") {
-    rightPressed = true;
+    player.rightPressed = true;
     player.isAnimatingRight = true;
   } else if (
     key === "Left" ||
     key === "ArrowLeft" ||
     key.toLowerCase() === "a"
   ) {
-    leftPressed = true;
+    player.leftPressed = true;
     player.isAnimatingLeft = true;
   } else if (key === "Up" || key === "ArrowUp" || key.toLowerCase() === "w") {
-    upPressed = true;
+    player.upPressed = true;
     player.isAnimatingUp = true;
   } else if (
     key === "Down" ||
     key === "ArrowDown" ||
     key.toLowerCase() === "s"
   ) {
-    downPressed = true;
+    player.downPressed = true;
     player.isAnimatingDown = true;
   } else if (key === " " || key.toLowerCase() === "space") {
     placeBomb(); // Llamar a la función cuando se presiona la tecla espacio
@@ -276,24 +280,24 @@ function keyDownHandler(event) {
 function keyUpHandler(event) {
   const { key } = event;
   if (key === "Right" || key === "ArrowRight" || key.toLowerCase() === "d") {
-    rightPressed = false;
+    player.rightPressed = false;
     player.isAnimatingRight = false;
   } else if (
     key === "Left" ||
     key === "ArrowLeft" ||
     key.toLowerCase() === "a"
   ) {
-    leftPressed = false;
+    player.leftPressed = false;
     player.isAnimatingLeft = false;
   } else if (key === "Up" || key === "ArrowUp" || key.toLowerCase() === "w") {
-    upPressed = false;
+    player.upPressed = false;
     player.isAnimatingUp = false;
   } else if (
     key === "Down" ||
     key === "ArrowDown" ||
     key.toLowerCase() === "s"
   ) {
-    downPressed = false;
+    player.downPressed = false;
     player.isAnimatingDown = false;
   }
 }
