@@ -182,7 +182,8 @@ class Player {
         this.canMoveTo(
           nextGridXRight,
           Math.floor((this.y + this.height - 1) / cellSize)
-        )
+        ) &&
+        !this.isCollidingWithBomb(this.x + this.speed, this.y)
       ) {
         nextPlayerX += this.speed;
       }
@@ -192,7 +193,8 @@ class Player {
         this.canMoveTo(
           nextGridXLeft,
           Math.floor((this.y + this.height - 1) / cellSize)
-        )
+        ) &&
+        !this.isCollidingWithBomb(this.x - this.speed, this.y)
       ) {
         nextPlayerX -= this.speed;
       }
@@ -202,7 +204,8 @@ class Player {
         this.canMoveTo(
           Math.floor((this.x + this.width - 1) / cellSize),
           nextGridYUp
-        )
+        ) &&
+        !this.isCollidingWithBomb(this.x, this.y - this.speed)
       ) {
         nextPlayerY -= this.speed;
       }
@@ -215,7 +218,8 @@ class Player {
         this.canMoveTo(
           Math.floor((this.x + this.width - 1) / cellSize),
           nextGridYDown
-        )
+        ) &&
+        !this.isCollidingWithBomb(this.x, this.y + this.speed)
       ) {
         nextPlayerY += this.speed;
       }
@@ -225,6 +229,23 @@ class Player {
       this.x = nextPlayerX;
       this.y = nextPlayerY;
     }
+  }
+
+  isCollidingWithBomb(x, y) {
+    for (let i = 0; i < this.bombs.length; i++) {
+      const bombX = this.bombs[i][0];
+      const bombY = this.bombs[i][1];
+      // Verificar si la posición del jugador está dentro del área de la bomba
+      if (
+        x + this.width >= bombX &&
+        x <= bombX + cellSize &&
+        y + this.height >= bombY &&
+        y <= bombY + cellSize
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   canMoveTo(gridX, gridY) {
