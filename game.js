@@ -28,8 +28,9 @@ const ctx = canvas.getContext("2d");
 // Ancho y alto del canvas
 canvas.width = 1050;
 canvas.height = 545;
-
+// Tamaño de la celda
 const cellSize = 42;
+
 //DIBUJAR EL MAPA
 function drawMap() {
   // Iterar sobre cada celda del mapa
@@ -90,13 +91,8 @@ class Player {
     this.upPressed = false;
     this.downPressed = false;
     this.direction = "right";
-
     this.playerAnimationFrame = 0; // Índice de la animación del jugador
     this.playerAnimationCounter = 0; // Contador para controlar la velocidad de la animación
-
-    // VARIABLES BOMBAS
-    //this.bombX = -100; // Inicialmente fuera del canvas
-    //this.bombY = -100; // Inicialmente fuera del canvas
     this.bombs = [];
   }
   draw() {
@@ -139,6 +135,7 @@ class Player {
     }
 
     // Dibujar el sprite del jugador con las coordenadas de recorte adecuadas
+    // Dibujar el sprite del jugador con las coordenadas de recorte adecuadas
     ctx.drawImage(
       spriteSheet,
       animationCoordinates[this.playerAnimationFrame][0],
@@ -149,6 +146,17 @@ class Player {
       this.y,
       32, // Ancho del sprite dibujado
       32 // Alto del sprite dibujado
+    );
+
+    // Agregar un borde alrededor del sprite dibujado
+    const borderWidth = 2; // Ancho del borde
+    ctx.strokeStyle = "red"; // Color del borde
+    ctx.lineWidth = borderWidth; // Grosor del borde
+    ctx.strokeRect(
+      this.x - borderWidth / 2,
+      this.y - borderWidth / 2,
+      32 + borderWidth,
+      32 + borderWidth
     );
 
     // Controlar la velocidad de la animación si está activa
@@ -261,7 +269,7 @@ class Player {
   drawBomb() {
     // Dibujar la bomba
     for (let i = 0; i < this.bombs.length; i++) {
-      console.log(this.bombs[i]);
+      //   console.log(this.bombs[i]);
       ctx.drawImage(
         spriteSheet,
         32,
@@ -278,30 +286,43 @@ class Player {
   placeBomb() {
     console.log("pulsado space");
 
+    // Obtener las coordenadas de la celda en la que se encuentra el jugador
+    const playerGridX = Math.floor((this.x + cellSize / 2) / cellSize);
+    const playerGridY = Math.floor((this.y + cellSize / 2) / cellSize);
+
+    let targetGridX = playerGridX;
+    let targetGridY = playerGridY;
+
+    // Calcular las coordenadas de la celda adyacente en función de la dirección del jugador
     if (this.direction === "right") {
-      this.bombs.push([this.x + cellSize, this.y]); // Colocar la bomba en la posición actual del jugador en X
+      targetGridX++;
     } else if (this.direction === "left") {
-      this.bombs.push([this.x - cellSize, this.y]); // Colocar la bomba en la posición actual del jugador en X
+      targetGridX--;
     } else if (this.direction === "up") {
-      this.bombs.push([this.x, this.y - cellSize]); // Colocar la bomba en la posición actual del jugador en Y
+      targetGridY--;
     } else if (this.direction === "down") {
-      this.bombs.push([this.x, this.y + cellSize]);
+      targetGridY++;
     }
 
-    // Después de 5 segundos, eliminar la bomba
-    // Suponiendo que `this.bombs` es un array que contiene las coordenadas de las bombas
+    // Verificar si la celda adyacente es válida para colocar la bomba
+    if (
+      targetGridX >= 0 &&
+      targetGridX < level[0].length &&
+      targetGridY >= 0 &&
+      targetGridY < level.length
+    ) {
+      const targetCellValue = level[targetGridY][targetGridX];
+      if (targetCellValue !== 1 && targetCellValue !== 2) {
+        // La celda adyacente es válida, colocar la bomba en esa posición
+        const bombX = targetGridX * cellSize;
+        const bombY = targetGridY * cellSize;
+        this.bombs.push([bombX, bombY]);
 
-    for (let i = 0; i < this.bombs.length; i++) {
-      // Usamos una función dentro de un bucle para capturar el valor actual de `i`
-      let bombsArray = this.bombs;
-      setTimeout(
-        function (index) {
-          // Para cada bomba, creamos un temporizador que las elimine después de 3 segundos
-          bombsArray.splice(index, 1); // Eliminar la bomba en la posición `index`
-          console.log("Bomba eliminada:", index);
-        }.bind(this, i),
-        3000
-      ); // Usamos bind para pasar el valor actual de `i` y mantener el contexto de `this`
+        // Después de 5 segundos, eliminar la bomba
+        setTimeout(() => {
+          this.bombs.shift(); // Eliminar la bomba más antigua (primera en el array)
+        }, 5000);
+      }
     }
   }
 }
